@@ -1,13 +1,16 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
 
 const PORT = process.env.PORT || 3000;
-const SUPABASE_URL = 'https://vfwitbvxflshpzqmyhvwl.supabase.co/rest/v1/bookings';
+const SUPABASE_URL = 'https://vfwitbvxflshpzqmyhvwl.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmd2l0YnZ4ZnNocHpxbXlodndsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODM4MjksImV4cCI6MjEwMzA1OTgyOX0.wFvFMC6TpKGQLrj89fYC2eztXtnX4tE-NRZ1KcTpKPs';
 
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const server = http.createServer(async (req, res) => {
-  // 1. تقديم ملف HTML
+  // 1. تقديم ملف index.html
   if (req.method === 'GET' && (req.url === '/' || req.url === '/index.html')) {
     fs.readFile(path.join(__dirname, 'index.html'), (err, content) => {
       if (err) {
@@ -21,50 +24,31 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 2. جلب الحجوزات
+  // 2. جلب كافة الحجوزات
   if (req.method === 'GET' && req.url === '/api/bookings') {
     try {
-      const response = await fetch(`${SUPABASE_URL}?select=*`, {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
-      });
-      const data = await response.json();
+      const { data, error } = await supabase.from('bookings').select('*');
+      if (error) throw error;
+      
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(data));
+      res.end(JSON.stringify(data || []));
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: e.message }));
+      res.end(JSON.stringify({ message: e.message }));
     }
     return;
   }
 
-  // 3. إضافة حجز جديد (تصليح إرسال البيانات إلى Supabase)
+  // 3. إضافة حجز جديد
   if (req.method === 'POST' && req.url === '/api/bookings') {
     let body = '';
     req.on('data', chunk => { body += chunk.toString(); });
     req.on('end', async () => {
       try {
-        const parsedBody = JSON.parse(body);
-        const response = await fetch(SUPABASE_URL, {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation'
-          },
-          body: JSON.stringify(parsedBody)
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          res.writeHead(response.status, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ message: data.message || data.hint || 'Supabase error' }));
-          return;
-        }
+        const bookingData = JSON.parse(body);
+        const { data, error } = await supabase.from('bookings').insert([bookingData]).select();
+        
+        if (error) throw error;
 
         res.writeHead(201, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(data));
@@ -80,18 +64,14 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'DELETE' && req.url.startsWith('/api/bookings/')) {
     const id = req.url.split('/')[3];
     try {
-      const response = await fetch(`${SUPABASE_URL}?id=eq.${id}`, {
-        method: 'DELETE',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
-      });
+      const { error } = await supabase.from('bookings').delete().eq('id', id);
+      if (error) throw error;
+
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true }));
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: e.message }));
+      res.end(JSON.stringify({ message: e.message }));
     }
     return;
   }
