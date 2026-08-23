@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
   <meta name="apple-mobile-web-app-title" content="The Suite"/>
   <meta name="theme-color" content="#f4f0f8"/>
   <title>The Suite by ABC - VIP Booking Dashboard</title>
   
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23582c83'/><text x='50%' y='68%' font-size='60' font-weight='bold' fill='%23ffffff' text-anchor='middle'>S</text></svg>"/>
+  
+  <!-- Supabase JS Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -104,15 +106,20 @@
   </div>
 
   <script>
+    const SUPABASE_URL = 'https://vfwitbvxflshpzqmyhvwl.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmd2l0YnZ4ZnNocHpxbXlodndsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODM4MjksImV4cCI6MjEwMzA1OTgyOX0.wFvFMC6TpKGQLrj89fYC2eztXtnX4tE-NRZ1KcTpKPs';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     let bookings = [];
     const bookingDateInput = document.getElementById('bookingDate');
     bookingDateInput.value = new Date().toISOString().split('T')[0];
 
     async function loadBookings() {
       try {
-        const res = await fetch('/api/bookings');
-        if (res.ok) {
-          bookings = await res.json();
+        const { data, error } = await supabaseClient.from('bookings').select('*');
+        if (!error && data) {
+          bookings = data;
           renderBookings();
           updateSlots();
         }
@@ -216,19 +223,14 @@
       };
 
       try {
-        const res = await fetch('/api/bookings', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newBooking)
-        });
+        const { error } = await supabaseClient.from('bookings').insert([newBooking]);
 
-        if (res.ok) {
+        if (!error) {
           document.getElementById('clientName').value = '';
           document.getElementById('clientPhone').value = '';
           loadBookings();
         } else {
-          const errData = await res.json();
-          alert('Save Error: ' + (errData.message || 'Could not save booking'));
+          alert('Save Error: ' + error.message);
         }
       } catch (e) {
         alert('Request Error: ' + e.message);
@@ -238,8 +240,8 @@
     async function deleteBooking(id) {
       if (confirm('Cancel this VIP booking?')) {
         try {
-          const res = await fetch(`/api/bookings/${id}`, { method: 'DELETE' });
-          if (res.ok) loadBookings();
+          const { error } = await supabaseClient.from('bookings').delete().eq('id', id);
+          if (!error) loadBookings();
         } catch (e) {
           alert('Error deleting booking.');
         }
