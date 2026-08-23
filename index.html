@@ -4,21 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
   <meta name="apple-mobile-web-app-title" content="The Suite"/>
-  <meta name="mobile-web-app-capable" content="yes"/>
-  <meta name="theme-color" content="#0b0b0d"/>
+  <meta name="theme-color" content="#f4f0f8"/>
   <title>The Suite by ABC - VIP Booking Dashboard</title>
   
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b0b0d'/><text x='50%' y='68%' font-size='60' font-weight='bold' fill='%23d4af37' text-anchor='middle'>S</text></svg>"/>
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b0b0d'/><text x='50%' y='68%' font-size='60' font-weight='bold' fill='%23d4af37' text-anchor='middle'>S</text></svg>"/>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23582c83'/><text x='50%' y='68%' font-size='60' font-weight='bold' fill='%23ffffff' text-anchor='middle'>S</text></svg>"/>
   
   <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
     
     body { 
-      background-color: #0b0b0d; 
-      color: #f2f2f7; 
+      background-color: #f4f0f8; 
+      color: #2c2a2e; 
       margin: 0; 
       padding: env(safe-area-inset-top, 20px) 16px env(safe-area-inset-bottom, 20px) 16px; 
       font-size: 15px; 
@@ -30,37 +28,37 @@
     .header { 
       text-align: center; 
       padding: 12px 0 18px; 
-      border-bottom: 1px solid #2c2c2e; 
+      border-bottom: 1px solid #e2d9eb; 
       margin-bottom: 16px; 
     }
     .header h1 { 
       font-size: 22px; 
       font-weight: 700; 
-      color: #d4af37; 
+      color: #582c83; 
       margin: 0 0 2px 0; 
       letter-spacing: 1px; 
     }
     .header p { 
       font-size: 11px; 
-      color: #8e8e93; 
+      color: #7a6e85; 
       margin: 0; 
       text-transform: uppercase; 
       letter-spacing: 1.5px; 
     }
     
     .card { 
-      background: #1c1c1e; 
-      border: 1px solid #2c2c2e; 
+      background: #ffffff; 
+      border: 1px solid #e6def0; 
       border-radius: 16px; 
       padding: 16px; 
       margin-bottom: 16px; 
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4); 
+      box-shadow: 0 4px 16px rgba(88, 44, 131, 0.05); 
     }
     .card h2 { 
-      font-size: 15px; 
-      color: #d4af37; 
+      font-size: 14px; 
+      color: #582c83; 
       margin: 0 0 12px 0; 
-      font-weight: 600; 
+      font-weight: 700; 
       text-transform: uppercase; 
       letter-spacing: 0.5px; 
       display: flex; 
@@ -71,11 +69,11 @@
     label { 
       display: block; 
       font-size: 11px; 
-      color: #98989d; 
+      color: #6b5b7b; 
       text-transform: uppercase; 
       letter-spacing: 0.5px; 
       margin: 10px 0 4px; 
-      font-weight: 600; 
+      font-weight: 700; 
     }
     label:first-of-type { margin-top: 0; }
     
@@ -84,10 +82,10 @@
       height: 48px; 
       padding: 0 14px; 
       border-radius: 10px; 
-      border: 1px solid #3a3a3c; 
-      background: #2c2c2e; 
-      color: #fff; 
-      font-size: 16px; 
+      border: 1px solid #dcd1e8; 
+      background: #fbf9fc; 
+      color: #2c2a2e; 
+      font-size: 15px; 
       outline: none; 
       transition: border-color 0.2s; 
       -webkit-appearance: none; 
@@ -95,13 +93,13 @@
       -webkit-user-select: text;
       user-select: text;
     }
-    input:focus, select:focus { border-color: #d4af37; }
+    input:focus, select:focus { border-color: #582c83; background: #fff; }
     
     .select-wrapper { position: relative; }
     .select-wrapper::after {
       content: "▼";
       font-size: 10px;
-      color: #8e8e93;
+      color: #582c83;
       position: absolute;
       right: 14px;
       top: 50%;
@@ -111,12 +109,12 @@
 
     .btn { 
       width: 100%; 
-      height: 50px; 
+      height: 48px; 
       border-radius: 12px; 
       border: none; 
-      background: #d4af37; 
-      color: #000; 
-      font-size: 15px; 
+      background: #582c83; 
+      color: #ffffff; 
+      font-size: 14px; 
       font-weight: 700; 
       margin-top: 14px; 
       cursor: pointer; 
@@ -126,39 +124,42 @@
       align-items: center; 
       justify-content: center; 
       gap: 8px; 
-      box-shadow: 0 4px 12px rgba(212,175,55,0.2);
+      box-shadow: 0 4px 12px rgba(88, 44, 131, 0.2);
     }
-    .btn:active { background: #b8962d; transform: scale(0.98); }
-    .btn-secondary { background: #2c2c2e; color: #d4af37; border: 1px solid #d4af37; box-shadow: none; }
-    .btn-secondary:active { background: #3a3a3c; }
+    .btn:active { background: #421d66; transform: scale(0.98); }
+    .btn-secondary { background: #efe6f7; color: #582c83; border: 1px solid #d4c2e5; box-shadow: none; }
+    .btn-secondary:active { background: #e3d3f2; }
     
     .btn-row { display: flex; gap: 10px; }
     .btn-row .btn { flex: 1; margin-top: 10px; }
     
     .booking-card { 
-      background: #2c2c2e; 
+      background: #fbf9fc; 
       border-radius: 12px; 
       padding: 14px; 
       margin-top: 10px; 
-      border-left: 4px solid #d4af37; 
+      border-left: 4px solid #582c83; 
+      border-top: 1px solid #efe8f5;
+      border-right: 1px solid #efe8f5;
+      border-bottom: 1px solid #efe8f5;
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
     }
     .booking-info { flex: 1; min-width: 0; }
-    .booking-time { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 2px; }
-    .booking-name { font-size: 14px; color: #e5e5e7; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .booking-phone { font-size: 13px; color: #d4af37; text-decoration: none; display: inline-block; font-weight: 600; }
-    .booking-meta { font-size: 11px; color: #8e8e93; margin-top: 4px; text-transform: uppercase; }
+    .booking-time { font-size: 15px; font-weight: 700; color: #582c83; margin-bottom: 2px; }
+    .booking-name { font-size: 14px; color: #2c2a2e; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .booking-phone { font-size: 13px; color: #8c1d40; text-decoration: none; display: inline-block; font-weight: 600; }
+    .booking-meta { font-size: 11px; color: #7a6e85; margin-top: 4px; text-transform: uppercase; }
     
     .action-group { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; margin-left: 10px; flex-shrink: 0; }
     .btn-cal { 
-      background: #30d158; 
-      color: #000; 
+      background: #00875a; 
+      color: #ffffff; 
       border: none; 
       border-radius: 8px; 
       padding: 8px 12px; 
-      font-size: 12px; 
+      font-size: 11px; 
       font-weight: 700; 
       cursor: pointer; 
       display: flex; 
@@ -166,9 +167,9 @@
       gap: 4px;
     }
     .btn-delete { 
-      background: rgba(255, 69, 58, 0.15); 
-      color: #ff453a; 
-      border: 1px solid #ff453a; 
+      background: rgba(157, 34, 53, 0.1); 
+      color: #9d2235; 
+      border: 1px solid rgba(157, 34, 53, 0.3); 
       border-radius: 8px; 
       padding: 6px 12px; 
       font-size: 11px; 
@@ -176,24 +177,24 @@
       cursor: pointer; 
     }
     
-    .empty-state { text-align: center; color: #8e8e93; font-size: 13px; padding: 20px 0; font-style: italic; }
-    .badge { background: rgba(212,175,55,0.15); color: #d4af37; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+    .empty-state { text-align: center; color: #8e809a; font-size: 13px; padding: 20px 0; font-style: italic; }
+    .badge { background: rgba(88, 44, 131, 0.1); color: #582c83; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
     
-    .export-modal { background: #242426; border: 1px solid #3a3a3c; border-radius: 12px; padding: 14px; margin-top: 10px; }
-    .summary-box { background: #1c1c1e; padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 13px; color: #d4af37; font-weight: 600; line-height: 1.5; }
+    .export-modal { background: #f8f4fb; border: 1px solid #e6def0; border-radius: 12px; padding: 14px; margin-top: 10px; }
+    .summary-box { background: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid #e2d9eb; margin-top: 10px; font-size: 13px; color: #582c83; font-weight: 600; line-height: 1.5; }
     
     .install-banner {
-      background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
-      border: 1px solid #d4af37;
+      background: #efe6f7;
+      border: 1px solid #d4c2e5;
       border-radius: 14px;
       padding: 12px;
       margin-bottom: 16px;
       font-size: 12px;
-      color: #e5e5e7;
+      color: #421d66;
       line-height: 1.4;
       display: block;
     }
-    .install-banner strong { color: #d4af37; font-size: 13px; }
+    .install-banner strong { color: #582c83; font-size: 13px; }
   </style>
 </head>
 <body>
@@ -262,7 +263,7 @@
   <!-- REPORTING & EXPORT MODULE -->
   <div class="card">
     <h2>Reports & Export</h2>
-    <p style="font-size: 12px; color: #8e8e93; margin: 0 0 10px 0;">Filter totals & export reports.</p>
+    <p style="font-size: 12px; color: #7a6e85; margin: 0 0 10px 0;">Filter totals & export reports.</p>
     
     <div class="export-modal">
       <label>Export Filter Mode</label>
@@ -296,7 +297,6 @@
   </div>
 
   <script>
-    // Safe storage handler that won't break inside iOS File Viewer
     let bookings = [];
     
     function getStoredBookings() {
@@ -320,7 +320,6 @@
       }
     }
 
-    // Set Default Dates
     const bookingDateInput = document.getElementById('bookingDate');
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -535,7 +534,6 @@ END:VCALENDAR`;
       document.body.removeChild(link);
     }
 
-    // Dynamic Listeners
     ['change', 'input', 'keyup'].forEach(evtName => {
       bookingDateInput.addEventListener(evtName, () => { updateSlots(); renderBookings(); });
     });
@@ -546,7 +544,6 @@ END:VCALENDAR`;
     document.getElementById('summaryBtn').addEventListener('click', calculateSummary);
     document.getElementById('exportCsvBtn').addEventListener('click', exportCSV);
 
-    // Initial Trigger
     updateSlots();
     renderBookings();
   </script>
