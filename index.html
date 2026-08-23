@@ -194,7 +194,7 @@
           </div>
           <div class="action-group">
             <button class="btn-delete" data-id="${b.id}">Cancel</button>
-            <button class="btn-sync" data-id="${b.id}">📅 Sync</button>
+            <button class="btn-sync" data-id="${b.id}">📞 Call Reminder</button>
           </div>
         `;
         // Attach listeners via data-id lookup instead of inline onclick,
@@ -254,13 +254,15 @@
       }
     }
 
-    // Generates a .ics calendar file for a single booking and triggers a download.
+    // Generates a .ics calendar reminder to CALL the client, scheduled 24 hours
+    // before their actual appointment time (not an event for the appointment itself).
     // On a phone, opening the downloaded file brings up the native
     // "Add to Calendar" screen (Apple Calendar / Google Calendar / Outlook).
     function syncToPhone(booking) {
       try {
-        const startDate = new Date(`${booking.date}T${booking.raw_time}:00`);
-        const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour appointment
+        const appointmentDate = new Date(`${booking.date}T${booking.raw_time}:00`);
+        const reminderStart = new Date(appointmentDate.getTime() - 24 * 60 * 60 * 1000); // 24h before
+        const reminderEnd = new Date(reminderStart.getTime() + 15 * 60 * 1000); // 15-min block to make the call
 
         const toICSDate = (d) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
 
@@ -269,17 +271,17 @@
           'VERSION:2.0',
           'PRODID:-//The Suite by ABC//VIP Booking//EN',
           'BEGIN:VEVENT',
-          `UID:${booking.id}@thesuite.vip`,
+          `UID:call-${booking.id}@thesuite.vip`,
           `DTSTAMP:${toICSDate(new Date())}`,
-          `DTSTART:${toICSDate(startDate)}`,
-          `DTEND:${toICSDate(endDate)}`,
-          `SUMMARY:VIP Appointment - ${booking.name}`,
-          `DESCRIPTION:Consultant: ${booking.consultant}\\nPhone: ${booking.phone}`,
+          `DTSTART:${toICSDate(reminderStart)}`,
+          `DTEND:${toICSDate(reminderEnd)}`,
+          `SUMMARY:Call ${booking.name} - Confirm VIP Appointment`,
+          `DESCRIPTION:Call ${booking.phone} to confirm tomorrow's appointment at ${booking.time_display || booking.raw_time}\\nConsultant: ${booking.consultant}`,
           `LOCATION:The Suite by ABC`,
           'BEGIN:VALARM',
-          'TRIGGER:-PT30M',
+          'TRIGGER:-PT0M',
           'ACTION:DISPLAY',
-          'DESCRIPTION:Reminder - VIP appointment in 30 minutes',
+          'DESCRIPTION:Call client - appointment confirmation due',
           'END:VALARM',
           'END:VEVENT',
           'END:VCALENDAR'
@@ -288,12 +290,12 @@
         const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
-        link.download = `VIP_Appointment_${(booking.name || 'booking').replace(/\s+/g, '_')}.ics`;
+        link.download = `Call_Reminder_${(booking.name || 'booking').replace(/\s+/g, '_')}.ics`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       } catch (e) {
-        alert('Could not create calendar reminder: ' + e.message);
+        alert('Could not create call reminder: ' + e.message);
       }
     }
 
