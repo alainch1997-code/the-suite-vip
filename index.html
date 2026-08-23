@@ -128,23 +128,13 @@
   </div>
 
   <script>
-    const API_URL = 'https://vfwitbvxflshpzqmyhvwl.supabase.co/rest/v1/bookings';
-    const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmd2l0YnZ4ZnNocHpxbXlodndsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODM4MjksImV4cCI6MjEwMzA1OTgyOX0.wFvFMC6TpKGQLrj89fYC2eztXtnX4tE-NRZ1KcTpKPs';
-
-    const headers = {
-      'apikey': API_KEY,
-      'Authorization': 'Bearer ' + API_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    };
-
     let bookings = [];
     const bookingDateInput = document.getElementById('bookingDate');
     bookingDateInput.value = new Date().toISOString().split('T')[0];
 
     async function loadBookings() {
       try {
-        const res = await fetch(API_URL + '?select=*', { headers });
+        const res = await fetch('/api/bookings');
         if (res.ok) {
           bookings = await res.json();
           renderBookings();
@@ -177,7 +167,7 @@
         let timeStr = `${displayHour}:00 ${ampm}`;
         let rawTime = (h < 10 ? '0' : '') + h + ':00';
 
-        let isBooked = bookings.some(b => b.date === selectedDate && b.raw_time === rawTime);
+        let isBooked = Array.isArray(bookings) && bookings.some(b => b.date === selectedDate && b.raw_time === rawTime);
         
         if (!isBooked) {
           let opt = document.createElement('option');
@@ -198,7 +188,7 @@
     function renderBookings() {
       const list = document.getElementById('bookingList');
       const selectedDate = bookingDateInput.value;
-      const filtered = bookings.filter(b => b.date === selectedDate);
+      const filtered = Array.isArray(bookings) ? bookings.filter(b => b.date === selectedDate) : [];
 
       if (filtered.length === 0) {
         list.innerHTML = '<div class="empty-state">No appointments booked for this date.</div>';
@@ -251,9 +241,9 @@
       };
 
       try {
-        const res = await fetch(API_URL, {
+        const res = await fetch('/api/bookings', {
           method: 'POST',
-          headers,
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newBooking)
         });
 
@@ -262,21 +252,17 @@
           document.getElementById('clientPhone').value = '';
           loadBookings();
         } else {
-          const err = await res.json();
-          alert('Error: ' + (err.message || 'Could not save booking'));
+          alert('Could not save booking');
         }
       } catch (e) {
-        alert('Network error, please try again.');
+        alert('Error saving booking');
       }
     }
 
     async function deleteBooking(id) {
       if (confirm('Cancel this VIP booking?')) {
         try {
-          const res = await fetch(`${API_URL}?id=eq.${id}`, {
-            method: 'DELETE',
-            headers
-          });
+          const res = await fetch(`/api/bookings/${id}`, { method: 'DELETE' });
           if (res.ok) loadBookings();
         } catch (e) {
           alert('Error deleting booking.');
@@ -285,7 +271,7 @@
     }
 
     function calculateSummary() {
-      const filtered = bookings;
+      const filtered = Array.isArray(bookings) ? bookings : [];
       const alainCount = filtered.filter(b => b.consultant === 'Alain').length;
       const raneemCount = filtered.filter(b => b.consultant === 'Raneem').length;
       
@@ -297,7 +283,7 @@
     }
 
     function exportCSV() {
-      if (bookings.length === 0) {
+      if (!Array.isArray(bookings) || bookings.length === 0) {
         alert('No bookings available to export.');
         return;
       }
@@ -325,7 +311,7 @@
     document.getElementById('exportCsvBtn').addEventListener('click', exportCSV);
 
     loadBookings();
-    setInterval(loadBookings, 5000); // تحديث تلقائي كل 5 ثوانٍ لضمان التزامن مع رنيم
+    setInterval(loadBookings, 3000); // تحديث تلقائي كل 3 ثوانٍ بينك وبين رنيم
   </script>
 </body>
 </html>
