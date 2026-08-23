@@ -10,9 +10,6 @@
   <title>The Suite by ABC - VIP Booking Dashboard</title>
   
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23582c83'/><text x='50%' y='68%' font-size='60' font-weight='bold' fill='%23ffffff' text-anchor='middle'>S</text></svg>"/>
-  
-  <!-- Supabase JS Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -63,7 +60,6 @@
     .booking-meta { font-size: 11px; color: #7a6e85; margin-top: 4px; text-transform: uppercase; }
     
     .action-group { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; margin-left: 10px; flex-shrink: 0; }
-    .btn-cal { background: #00875a; color: #ffffff; border: none; border-radius: 8px; padding: 8px 12px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; }
     .btn-delete { background: rgba(157, 34, 53, 0.1); color: #9d2235; border: 1px solid rgba(157, 34, 53, 0.3); border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; }
     
     .empty-state { text-align: center; color: #8e809a; font-size: 13px; padding: 20px 0; font-style: italic; }
@@ -132,33 +128,32 @@
   </div>
 
   <script>
-    const SUPABASE_URL = 'https://vfwitbvxflshpzqmyhvwl.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmd2l0YnZ4ZnNocHpxbXlodndsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODM4MjksImV4cCI6MjEwMzA1OTgyOX0.wFvFMC6TpKGQLrj89fYC2eztXtnX4tE-NRZ1KcTpKPs';
-    
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    let bookings = [];
+    const API_URL = 'https://vfwitbvxflshpzqmyhvwl.supabase.co/rest/v1/bookings';
+    const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmd2l0YnZ4ZnNocHpxbXlodndsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODM4MjksImV4cCI6MjEwMzA1OTgyOX0.wFvFMC6TpKGQLrj89fYC2eztXtnX4tE-NRZ1KcTpKPs';
 
+    const headers = {
+      'apikey': API_KEY,
+      'Authorization': 'Bearer ' + API_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    };
+
+    let bookings = [];
     const bookingDateInput = document.getElementById('bookingDate');
-    const today = new Date();
-    bookingDateInput.value = today.toISOString().split('T')[0];
+    bookingDateInput.value = new Date().toISOString().split('T')[0];
 
     async function loadBookings() {
-      const { data, error } = await db.from('bookings').select('*');
-      if (error) {
-        console.error('Error fetching bookings:', error);
-      } else {
-        bookings = data || [];
-        renderBookings();
-        updateSlots();
+      try {
+        const res = await fetch(API_URL + '?select=*', { headers });
+        if (res.ok) {
+          bookings = await res.json();
+          renderBookings();
+          updateSlots();
+        }
+      } catch (e) {
+        console.error('Fetch error', e);
       }
     }
-
-    // Realtime Sync Subscription
-    db.channel('public:bookings')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => {
-        loadBookings();
-      })
-      .subscribe();
 
     function updateSlots() {
       const shiftVal = document.getElementById('shift').value;
@@ -255,21 +250,37 @@
         consultant: document.getElementById('consultant').value 
       };
 
-      const { error } = await db.from('bookings').insert([newBooking]);
-      if (error) {
-        alert('Error saving booking: ' + error.message);
-      } else {
-        document.getElementById('clientName').value = '';
-        document.getElementById('clientPhone').value = '';
-        loadBookings();
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(newBooking)
+        });
+
+        if (res.ok) {
+          document.getElementById('clientName').value = '';
+          document.getElementById('clientPhone').value = '';
+          loadBookings();
+        } else {
+          const err = await res.json();
+          alert('Error: ' + (err.message || 'Could not save booking'));
+        }
+      } catch (e) {
+        alert('Network error, please try again.');
       }
     }
 
     async function deleteBooking(id) {
       if (confirm('Cancel this VIP booking?')) {
-        const { error } = await db.from('bookings').delete().eq('id', id);
-        if (error) alert('Error deleting booking: ' + error.message);
-        else loadBookings();
+        try {
+          const res = await fetch(`${API_URL}?id=eq.${id}`, {
+            method: 'DELETE',
+            headers
+          });
+          if (res.ok) loadBookings();
+        } catch (e) {
+          alert('Error deleting booking.');
+        }
       }
     }
 
@@ -314,6 +325,7 @@
     document.getElementById('exportCsvBtn').addEventListener('click', exportCSV);
 
     loadBookings();
+    setInterval(loadBookings, 5000); // تحديث تلقائي كل 5 ثوانٍ لضمان التزامن مع رنيم
   </script>
 </body>
 </html>
