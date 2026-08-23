@@ -212,7 +212,7 @@
         card.className = 'booking-card';
         card.innerHTML = `
           <div class="booking-info">
-            <div class="booking-time">${b.time_display}</div>
+            <div class="booking-time">${b.time_display || b.raw_time}</div>
             <div class="booking-name">${escapeHtml(b.name)}</div>
             <a href="tel:${escapeHtml(b.phone)}" class="booking-phone">📞 ${escapeHtml(b.phone)}</a>
             <div class="booking-meta">Consultant: ${escapeHtml(b.consultant)}</div>
@@ -239,8 +239,8 @@
       const selectedOpt = timeSelect.options[timeSelect.selectedIndex];
       const timeDisplay = selectedOpt ? selectedOpt.getAttribute('data-display') || rawTime : rawTime;
 
+      // شلنا إرسال الـ id لتتولّد تلقائياً من Supabase
       const newBooking = { 
-        id: Date.now(), 
         name, 
         phone, 
         raw_time: rawTime, 
@@ -266,10 +266,11 @@
           document.getElementById('clientPhone').value = '';
           loadBookings();
         } else {
-          alert('Could not save booking');
+          const errData = await res.json();
+          alert('Database Error: ' + (errData.message || errData.hint || 'Could not save booking'));
         }
       } catch (e) {
-        alert('Error saving booking');
+        alert('Network Exception: ' + e.message);
       }
     }
 
@@ -310,7 +311,7 @@
 
       let csv = 'ID,Date,Time,Client Name,Phone,Consultant\n';
       bookings.forEach(b => {
-        csv += `"${b.id}","${b.date}","${b.time_display}","${(b.name || '').replace(/"/g, '""')}","${b.phone}","${b.consultant}"\n`;
+        csv += `"${b.id}","${b.date}","${b.time_display || b.raw_time}","${(b.name || '').replace(/"/g, '""')}","${b.phone}","${b.consultant}"\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
