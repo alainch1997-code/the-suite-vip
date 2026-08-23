@@ -39,7 +39,8 @@
     .booking-phone { font-size: 13px; color: #8c1d40; text-decoration: none; display: inline-block; font-weight: 600; }
     .booking-meta { font-size: 11px; color: #7a6e85; margin-top: 4px; text-transform: uppercase; }
     .action-group { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; margin-left: 10px; flex-shrink: 0; }
-    .btn-delete { background: rgba(157, 34, 53, 0.1); color: #9d2235; border: 1px solid rgba(157, 34, 53, 0.3); border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; }
+    .btn-delete { background: rgba(157, 34, 53, 0.1); color: #9d2235; border: 1px solid rgba(157, 34, 53, 0.3); border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .btn-sync { background: rgba(88, 44, 131, 0.1); color: #582c83; border: 1px solid rgba(88, 44, 131, 0.3); border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; }
     .empty-state { text-align: center; color: #8e809a; font-size: 13px; padding: 20px 0; font-style: italic; }
     .badge { background: rgba(88, 44, 131, 0.1); color: #582c83; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
     .export-modal { background: #f8f4fb; border: 1px solid #e6def0; border-radius: 12px; padding: 14px; margin-top: 10px; }
@@ -192,9 +193,14 @@
             <div class="booking-meta">Consultant: ${escapeHtml(b.consultant)}</div>
           </div>
           <div class="action-group">
-            <button class="btn-delete" onclick="deleteBooking(${b.id})">Cancel</button>
+            <button class="btn-delete" data-id="${b.id}">Cancel</button>
+            <button class="btn-sync" data-id="${b.id}">📅 Sync</button>
           </div>
         `;
+        // Attach listeners via data-id lookup instead of inline onclick,
+        // so client names/phones with quotes or special characters never break the HTML.
+        card.querySelector('.btn-delete').addEventListener('click', () => deleteBooking(b.id));
+        card.querySelector('.btn-sync').addEventListener('click', () => syncToPhone(b));
         list.appendChild(card);
       });
     }
@@ -245,6 +251,49 @@
         } catch (e) {
           alert('Error deleting booking.');
         }
+      }
+    }
+
+    // Generates a .ics calendar file for a single booking and triggers a download.
+    // On a phone, opening the downloaded file brings up the native
+    // "Add to Calendar" screen (Apple Calendar / Google Calendar / Outlook).
+    function syncToPhone(booking) {
+      try {
+        const startDate = new Date(`${booking.date}T${booking.raw_time}:00`);
+        const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour appointment
+
+        const toICSDate = (d) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+        const icsContent = [
+          'BEGIN:VCALENDAR',
+          'VERSION:2.0',
+          'PRODID:-//The Suite by ABC//VIP Booking//EN',
+          'BEGIN:VEVENT',
+          `UID:${booking.id}@thesuite.vip`,
+          `DTSTAMP:${toICSDate(new Date())}`,
+          `DTSTART:${toICSDate(startDate)}`,
+          `DTEND:${toICSDate(endDate)}`,
+          `SUMMARY:VIP Appointment - ${booking.name}`,
+          `DESCRIPTION:Consultant: ${booking.consultant}\\nPhone: ${booking.phone}`,
+          `LOCATION:The Suite by ABC`,
+          'BEGIN:VALARM',
+          'TRIGGER:-PT30M',
+          'ACTION:DISPLAY',
+          'DESCRIPTION:Reminder - VIP appointment in 30 minutes',
+          'END:VALARM',
+          'END:VEVENT',
+          'END:VCALENDAR'
+        ].join('\r\n');
+
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = `VIP_Appointment_${(booking.name || 'booking').replace(/\s+/g, '_')}.ics`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (e) {
+        alert('Could not create calendar reminder: ' + e.message);
       }
     }
 
