@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="The Suite"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="theme-color" content="#0b0b0d"/>
+  <title>The Suite by ABC - VIP Booking Dashboard</title>
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b0b0d'/><text x='50%' y='68%' font-size='60' font-weight='bold' fill='%23d4af37' text-anchor='middle'>S</text></svg>"/>
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b0b0d'/><text x='50%' y='68%' font-size='60' font-weight='bold' fill='%23d4af37' text-anchor='middle'>S</text></svg>"/>
+  
+  <style>
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    body { 
+      background-color: #0b0b0d; 
+      color: #f2f2f7; 
+      margin: 0; 
+      padding: env(safe-area-inset-top, 20px) 16px env(safe-area-inset-bottom, 20px) 16px; 
+      font-size: 15px; 
+      line-height: 1.4;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .header { 
+      text-align: center; 
+      padding: 12px 0 18px; 
+      border-bottom: 1px solid #2c2c2e; 
+      margin-bottom: 16px; 
+    }
+    .header h1 { 
+      font-size: 22px; 
+      font-weight: 700; 
+      color: #d4af37; 
+      margin: 0 0 2px 0; 
+      letter-spacing: 1px; 
+    }
+    .header p { 
+      font-size: 11px; 
+      color: #8e8e93; 
+      margin: 0; 
+      text-transform: uppercase; 
+      letter-spacing: 1.5px; 
+    }
+    
+    .card { 
+      background: #1c1c1e; 
+      border: 1px solid #2c2c2e; 
+      border-radius: 16px; 
+      padding: 16px; 
+      margin-bottom: 16px; 
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4); 
+    }
+    .card h2 { 
+      font-size: 15px; 
+      color: #d4af37; 
+      margin: 0 0 12px 0; 
+      font-weight: 600; 
+      text-transform: uppercase; 
+      letter-spacing: 0.5px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+    }
+    
+    label { 
+      display: block; 
+      font-size: 11px; 
+      color: #98989d; 
+      text-transform: uppercase; 
+      letter-spacing: 0.5px; 
+      margin: 10px 0 4px; 
+      font-weight: 600; 
+    }
+    label:first-of-type { margin-top: 0; }
+    
+    input, select { 
+      width: 100%; 
+      height: 48px; 
+      padding: 0 14px; 
+      border-radius: 10px; 
+      border: 1px solid #3a3a3c; 
+      background: #2c2c2e; 
+      color: #fff; 
+      font-size: 16px; 
+      outline: none; 
+      transition: border-color 0.2s; 
+      -webkit-appearance: none; 
+      appearance: none;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+    input:focus, select:focus { border-color: #d4af37; }
+    
+    .select-wrapper { position: relative; }
+    .select-wrapper::after {
+      content: "▼";
+      font-size: 10px;
+      color: #8e8e93;
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .btn { 
+      width: 100%; 
+      height: 50px; 
+      border-radius: 12px; 
+      border: none; 
+      background: #d4af37; 
+      color: #000; 
+      font-size: 15px; 
+      font-weight: 700; 
+      margin-top: 14px; 
+      cursor: pointer; 
+      text-transform: uppercase; 
+      letter-spacing: 0.5px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 8px; 
+      box-shadow: 0 4px 12px rgba(212,175,55,0.2);
+    }
+    .btn:active { background: #b8962d; transform: scale(0.98); }
+    .btn-secondary { background: #2c2c2e; color: #d4af37; border: 1px solid #d4af37; box-shadow: none; }
+    .btn-secondary:active { background: #3a3a3c; }
+    
+    .btn-row { display: flex; gap: 10px; }
+    .btn-row .btn { flex: 1; margin-top: 10px; }
+    
+    .booking-card { 
+      background: #2c2c2e; 
+      border-radius: 12px; 
+      padding: 14px; 
+      margin-top: 10px; 
+      border-left: 4px solid #d4af37; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    .booking-info { flex: 1; min-width: 0; }
+    .booking-time { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+    .booking-name { font-size: 14px; color: #e5e5e7; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .booking-phone { font-size: 13px; color: #d4af37; text-decoration: none; display: inline-block; font-weight: 600; }
+    .booking-meta { font-size: 11px; color: #8e8e93; margin-top: 4px; text-transform: uppercase; }
+    
+    .action-group { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; margin-left: 10px; flex-shrink: 0; }
+    .btn-cal { 
+      background: #30d158; 
+      color: #000; 
+      border: none; 
+      border-radius: 8px; 
+      padding: 8px 12px; 
+      font-size: 12px; 
+      font-weight: 700; 
+      cursor: pointer; 
+      display: flex; 
+      align-items: center; 
+      gap: 4px;
+    }
+    .btn-delete { 
+      background: rgba(255, 69, 58, 0.15); 
+      color: #ff453a; 
+      border: 1px solid #ff453a; 
+      border-radius: 8px; 
+      padding: 6px 12px; 
+      font-size: 11px; 
+      font-weight: 600; 
+      cursor: pointer; 
+    }
+    
+    .empty-state { text-align: center; color: #8e8e93; font-size: 13px; padding: 20px 0; font-style: italic; }
+    .badge { background: rgba(212,175,55,0.15); color: #d4af37; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+    
+    .export-modal { background: #242426; border: 1px solid #3a3a3c; border-radius: 12px; padding: 14px; margin-top: 10px; }
+    .summary-box { background: #1c1c1e; padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 13px; color: #d4af37; font-weight: 600; line-height: 1.5; }
+    
+    .install-banner {
+      background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+      border: 1px solid #d4af37;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: #e5e5e7;
+      line-height: 1.4;
+      display: block;
+    }
+    .install-banner strong { color: #d4af37; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+  <div class="install-banner" id="pwaBanner">
+    <strong>📲 Tip for Best Experience</strong><br/>
+    Open this file in <strong>Safari</strong>, tap <strong>Share</strong> (bottom icon) and select <strong>"Add to Home Screen"</strong>!
+  </div>
+
+  <div class="header">
+    <h1>THE SUITE</h1>
+    <p>ABC Store &bull; VIP Dashboard</p>
+  </div>
+
+  <!-- SHIFT & CONSULTANT CONFIG -->
+  <div class="card">
+    <h2>Shift & Schedule <span class="badge" id="slotCountBadge">8 Slots</span></h2>
+    
+    <label>Consultant On Duty</label>
+    <div class="select-wrapper">
+      <select id="consultant">
+        <option value="Alain">Alain</option>
+        <option value="Raneem">Raneem</option>
+      </select>
+    </div>
+
+    <label>Shift Mode Today</label>
+    <div class="select-wrapper">
+      <select id="shift">
+        <option value="9-17">9:00 AM – 5:00 PM</option>
+        <option value="12-20" selected>12:00 PM – 8:00 PM</option>
+        <option value="10-18">10:00 AM – 6:00 PM</option>
+        <option value="14-22">2:00 PM – 10:00 PM</option>
+        <option value="off">Suite Closed / Off Day</option>
+      </select>
+    </div>
+    
+    <label>Date</label>
+    <input type="date" id="bookingDate" />
+  </div>
+
+  <!-- NEW BOOKING FORM -->
+  <div class="card">
+    <h2>Book VIP Appointment</h2>
+    
+    <label>Client Full Name</label>
+    <input type="text" id="clientName" placeholder="e.g. Maya Khoury" autocomplete="off" />
+
+    <label>Client Phone Number</label>
+    <input type="tel" id="clientPhone" placeholder="e.g. +961 70 123 456" autocomplete="off" />
+
+    <label>Available Time Slot</label>
+    <div class="select-wrapper">
+      <select id="timeSlot"></select>
+    </div>
+
+    <button class="btn" id="confirmBtn">Confirm VIP Booking</button>
+  </div>
+
+  <!-- BOOKINGS MASTER LIST -->
+  <div class="card">
+    <h2>Confirmed Bookings</h2>
+    <div id="bookingList"></div>
+  </div>
+
+  <!-- REPORTING & EXPORT MODULE -->
+  <div class="card">
+    <h2>Reports & Export</h2>
+    <p style="font-size: 12px; color: #8e8e93; margin: 0 0 10px 0;">Filter totals & export reports.</p>
+    
+    <div class="export-modal">
+      <label>Export Filter Mode</label>
+      <div class="select-wrapper">
+        <select id="exportMode">
+          <option value="month">By Specific Month</option>
+          <option value="range">By Custom Date Range</option>
+          <option value="all">All Time History</option>
+        </select>
+      </div>
+
+      <div id="monthPickerGroup">
+        <label>Select Month</label>
+        <input type="month" id="exportMonth" />
+      </div>
+
+      <div id="rangePickerGroup" style="display: none;">
+        <label>Start Date</label>
+        <input type="date" id="exportStartDate" />
+        <label>End Date</label>
+        <input type="date" id="exportEndDate" />
+      </div>
+
+      <div class="summary-box" id="reportSummary">Tap Calculate Summary to view totals.</div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="summaryBtn">Summary</button>
+        <button class="btn" id="exportCsvBtn">📊 CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Safe storage handler that won't break inside iOS File Viewer
+    let bookings = [];
+    
+    function getStoredBookings() {
+      try {
+        if (window.localStorage) {
+          return JSON.parse(localStorage.getItem('suite_vip_bookings') || '[]');
+        }
+      } catch(e) {
+        console.warn('Storage disabled or restricted:', e);
+      }
+      return bookings;
+    }
+
+    function saveStorage() {
+      try {
+        if (window.localStorage) {
+          localStorage.setItem('suite_vip_bookings', JSON.stringify(bookings));
+        }
+      } catch(e) {
+        console.warn('Unable to save to localStorage:', e);
+      }
+    }
+
+    // Set Default Dates
+    const bookingDateInput = document.getElementById('bookingDate');
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    
+    bookingDateInput.value = `${yyyy}-${mm}-${dd}`;
+    document.getElementById('exportMonth').value = `${yyyy}-${mm}`;
+
+    bookings = getStoredBookings();
+
+    function updateSlots() {
+      const shiftVal = document.getElementById('shift').value;
+      const selectedDate = bookingDateInput.value;
+      const slotSelect = document.getElementById('timeSlot');
+      const badge = document.getElementById('slotCountBadge');
+      
+      slotSelect.innerHTML = '';
+
+      if (shiftVal === 'off') {
+        const opt = document.createElement('option');
+        opt.value = "";
+        opt.textContent = "Suite Closed";
+        slotSelect.appendChild(opt);
+        badge.textContent = 'Closed';
+        return;
+      }
+
+      const parts = shiftVal.split('-');
+      const startHour = parseInt(parts[0], 10);
+      const endHour = parseInt(parts[1], 10);
+
+      let availableCount = 0;
+      for (let h = startHour; h < endHour; h++) {
+        let displayHour = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+        let ampm = h >= 12 ? 'PM' : 'AM';
+        let timeStr = `${displayHour}:00 ${ampm}`;
+        let rawTime = (h < 10 ? '0' : '') + h + ':00';
+
+        let isBooked = bookings.some(b => b.date === selectedDate && b.rawTime === rawTime);
+        
+        if (!isBooked) {
+          let opt = document.createElement('option');
+          opt.value = rawTime;
+          opt.setAttribute('data-display', timeStr);
+          opt.textContent = timeStr + ' - Available';
+          slotSelect.appendChild(opt);
+          availableCount++;
+        }
+      }
+
+      if (availableCount === 0) {
+        let opt = document.createElement('option');
+        opt.value = "";
+        opt.textContent = "Fully Booked";
+        slotSelect.appendChild(opt);
+      }
+
+      badge.textContent = availableCount + ' Open Slots';
+    }
+
+    function renderBookings() {
+      const list = document.getElementById('bookingList');
+      const selectedDate = bookingDateInput.value;
+      const filtered = bookings.filter(b => b.date === selectedDate);
+
+      if (filtered.length === 0) {
+        list.innerHTML = '<div class="empty-state">No appointments booked for this date.</div>';
+        return;
+      }
+
+      filtered.sort((a, b) => a.rawTime.localeCompare(b.rawTime));
+
+      list.innerHTML = '';
+      filtered.forEach(b => {
+        const card = document.createElement('div');
+        card.className = 'booking-card';
+        
+        card.innerHTML = `
+          <div class="booking-info">
+            <div class="booking-time">${b.timeDisplay}</div>
+            <div class="booking-name">${escapeHtml(b.name)}</div>
+            <a href="tel:${escapeHtml(b.phone)}" class="booking-phone">📞 ${escapeHtml(b.phone)}</a>
+            <div class="booking-meta">Consultant: ${escapeHtml(b.consultant)}</div>
+          </div>
+          <div class="action-group">
+            <button class="btn-cal" onclick="downloadICSById(${b.id})">🔔 Sync</button>
+            <button class="btn-delete" onclick="deleteBooking(${b.id})">Cancel</button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function addBooking() {
+      const name = document.getElementById('clientName').value.trim();
+      const phone = document.getElementById('clientPhone').value.trim();
+      const timeSelect = document.getElementById('timeSlot');
+      const rawTime = timeSelect.value;
+      
+      if (!rawTime) {
+        alert('Please select a valid Available Time Slot.');
+        return;
+      }
+
+      const selectedOpt = timeSelect.options[timeSelect.selectedIndex];
+      const timeDisplay = selectedOpt ? (selectedOpt.getAttribute('data-display') || rawTime) : rawTime;
+      const date = bookingDateInput.value;
+      const consultant = document.getElementById('consultant').value;
+
+      if (!name || !phone) {
+        alert('Please enter both Client Name and Phone Number.');
+        return;
+      }
+
+      const newBooking = { id: Date.now(), name, phone, rawTime, timeDisplay, date, consultant };
+      bookings.push(newBooking);
+      saveStorage();
+
+      document.getElementById('clientName').value = '';
+      document.getElementById('clientPhone').value = '';
+
+      renderBookings();
+      updateSlots();
+    }
+
+    function deleteBooking(id) {
+      if (confirm('Cancel this VIP booking?')) {
+        bookings = bookings.filter(b => b.id !== id);
+        saveStorage();
+        renderBookings();
+        updateSlots();
+      }
+    }
+
+    function downloadICSById(id) {
+      const booking = bookings.find(b => b.id === id);
+      if (!booking) return;
+
+      const [year, month, day] = booking.date.split('-');
+      const [hour, minute] = booking.rawTime.split(':');
+      
+      const startDateStr = `${year}${month}${day}T${hour}${minute}00`;
+      const endHour = String(parseInt(hour, 10) + 1).padStart(2, '0');
+      const endDateStr = `${year}${month}${day}T${endHour}${minute}00`;
+
+      const icsData = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//The Suite by ABC//VIP Booking//EN
+BEGIN:VEVENT
+SUMMARY:Confirm VIP: ${booking.name} (${booking.phone})
+DESCRIPTION:VIP Appointment at The Suite by ABC.\\nClient: ${booking.name}\\nPhone: ${booking.phone}\\nConsultant: ${booking.consultant}
+DTSTART:${startDateStr}
+DTEND:${endDateStr}
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:24-Hour VIP Confirmation Reminder
+TRIGGER:-P1D
+END:VALARM
+END:VEVENT
+END:VCALENDAR`;
+
+      const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `VIP_Reminder_${booking.name.replace(/\s+/g, '_')}.ics`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function toggleExportFields() {
+      const mode = document.getElementById('exportMode').value;
+      document.getElementById('monthPickerGroup').style.display = mode === 'month' ? 'block' : 'none';
+      document.getElementById('rangePickerGroup').style.display = mode === 'range' ? 'block' : 'none';
+    }
+
+    function calculateSummary() {
+      const filtered = bookings;
+      const alainCount = filtered.filter(b => b.consultant === 'Alain').length;
+      const raneemCount = filtered.filter(b => b.consultant === 'Raneem').length;
+      
+      document.getElementById('reportSummary').innerHTML = `
+        <strong>Total Appointments:</strong> ${filtered.length}<br>
+        &bull; Alain: ${alainCount} bookings<br>
+        &bull; Raneem: ${raneemCount} bookings
+      `;
+    }
+
+    function exportCSV() {
+      if (bookings.length === 0) {
+        alert('No bookings available to export.');
+        return;
+      }
+
+      let csv = 'ID,Date,Time,Client Name,Phone,Consultant\n';
+      bookings.forEach(b => {
+        csv += `"${b.id}","${b.date}","${b.timeDisplay}","${(b.name || '').replace(/"/g, '""')}","${b.phone}","${b.consultant}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `The_Suite_Bookings_Report_${Date.now()}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Dynamic Listeners
+    ['change', 'input', 'keyup'].forEach(evtName => {
+      bookingDateInput.addEventListener(evtName, () => { updateSlots(); renderBookings(); });
+    });
+
+    document.getElementById('shift').addEventListener('change', updateSlots);
+    document.getElementById('exportMode').addEventListener('change', toggleExportFields);
+    document.getElementById('confirmBtn').addEventListener('click', addBooking);
+    document.getElementById('summaryBtn').addEventListener('click', calculateSummary);
+    document.getElementById('exportCsvBtn').addEventListener('click', exportCSV);
+
+    // Initial Trigger
+    updateSlots();
+    renderBookings();
+  </script>
+</body>
+</html>
